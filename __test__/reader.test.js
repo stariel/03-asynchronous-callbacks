@@ -18,6 +18,7 @@ describe('File Reader Module', () => {
     let file = `${__dirname}/../data/bad.txt`;
     reader(file, (err,data) => {
       expect(err).toBeDefined();
+      console.log(data);
     });
   });
 
@@ -28,6 +29,14 @@ describe('File Reader Module', () => {
       // We don't need to care what the text is, only that we got back a string
       // That's the interface of our reader module: Give a file+cb, get back stringified  contents
       expect(typeof data).toBe('string');
+    });
+  });
+
+  it('when given a real file, returns the contents', () => {
+    let file = ['../data/apples.txt','../data/bananas.txt'];
+    reader(file, (err,data) => {
+      expect(err).toBeUndefined();
+      expect(data).toBe(['words about apples', 'words about bananas']);
     });
   });
 
