@@ -40,4 +40,14 @@ describe('File Reader Module', () => {
     });
   });
 
+  it('when given multiple files, returns the contents in order', () => {
+    let file = ['../data/cucumbers.txt', '../data/apples.txt','../data/bananas.txt'];
+    reader(file, (err,data) => {
+      let expected = true;
+      let actual = data[0].startsWith('cucumbers');
+      expect(err).toBeUndefined();
+      expect(actual).toBe(expected);
+    });
+  });
+
 });
