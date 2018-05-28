@@ -1,53 +1,51 @@
 'use strict';
 
-// When mocking out embedded modules like fs or buffer, you have to tell jest to mock it
-// For 3rd party modules, you can "auto" mock them by simply putting them in the correct __mocks__ folder
-jest.mock('fs');
-
 const reader = require('../lib/reader.js');
 
 describe('File Reader Module', () => {
 
-  it('when given a bad file, returns an error', () => {
-    // Note that the actual path here doesn't really matter.
-    // If we weren't mocking, it would.  The "fs" module would need
-    // to find the actual file.
-    //
-    // Also note that this file is named "bad.txt".  Our mock fs module
-    // will always return an error if a file has the word "bad" in its name
-    let file = `${__dirname}/../data/bad.txt`;
-    reader(file, (err,data) => {
-      expect(err).toBeDefined();
+  it('when given a nonexistant file path, it returns an error', (done) => {
+    let file = [`[${__dirname}/../data/bad.txt]`];
+    reader(file, (err, data) => {
+      expect(err).not.toBeNull();
       console.log(data);
+      done();
     });
   });
 
-  it('when given a real file, returns the contents', () => {
-    let file = `${__dirname}/../../data/apples.txt`;
+  it('when given a real file it reads (and stringifys) the contents', () => {
+    let file = [`${__dirname}/../data/apples.txt`];
     reader(file, (err,data) => {
-      expect(err).toBeUndefined();
-      // We don't need to care what the text is, only that we got back a string
-      // That's the interface of our reader module: Give a file+cb, get back stringified  contents
-      expect(typeof data).toBe('string');
+      expect(err).toBeNull();
+      expect(typeof data).toBe('object');
     });
   });
 
-  it('when given a real file, returns the contents', () => {
-    let file = ['../data/apples.txt','../data/bananas.txt'];
+  it('when given a real file, returns the contents', (done) => {
+    let file = [`${__dirname}/../data/apples.txt`,`${__dirname}/../data/bananas.txt`];
     reader(file, (err,data) => {
-      expect(err).toBeUndefined();
-      expect(data).toBe(['words about apples', 'words about bananas']);
+      expect(err).toBeNull();
+      expect(data).toEqual(['words about apples', 'words about bananas']);
+      done();
     });
   });
 
-  it('when given multiple files, returns the contents in order', () => {
-    let file = ['../data/cucumbers.txt', '../data/apples.txt','../data/bananas.txt'];
+  it('when given multiple files, returns the contents in order', (done) => {
+    let file = [`${__dirname}/../data/apples.txt`, `${__dirname}/../data/cucumbers.txt`,`${__dirname}/../data/bananas.txt`];
     reader(file, (err,data) => {
-      let expected = true;
-      let actual = data[0].startsWith('cucumbers');
-      expect(err).toBeUndefined();
+      let actual = data[0];
+      let expected = 'words about apples';
+      expect(err).toBeNull();
       expect(actual).toBe(expected);
+      expected = true;
+      actual = data[1].startsWith('cucumbers');
+      expect(err).toBeNull();
+      expect(actual).toBe(expected);
+      actual = data[2];
+      expected = 'words about bananas';
+      expect(err).toBeNull();
+      expect(actual).toBe(expected);
+      done();
     });
   });
-
 });
